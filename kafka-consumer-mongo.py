@@ -43,7 +43,7 @@ consumer = KafkaConsumer(
         #'localhost:9092'
     ],
 )
-# Parse received data from Kafka
+
 for msg in consumer:
     record = json.loads(msg.value)
     print(record)
@@ -53,34 +53,36 @@ for msg in consumer:
 
     # Create dictionary and ingest data into MongoDB
     try:
-        comment_rec = {"userId": userId, "objectId": objectId, "comment": comment}
+        comment_rec = {
+            'userId': userId,
+            'objectId': objectId,
+            'comment': comment
+        }
         print(comment_rec)
-        comment_id = db.memes_info.insert_one(comment_rec)
-        print("Data inserted with record ids", comment_id)
+        comment_id = db.memes_comments.insert_one(comment_rec)
+        print("Comment inserted with record ids", comment_id)
+    except Exception as e:
+        print("Could not insert into MongoDB:")
 
-        subprocess.call(["sh", "./test.sh"])
-
-    except:
-        print("Could not insert into MongoDB")
-
-    # Create dictionary and ingest data into MongoDB
+    # Create bdnosql_sumary and insert groups into mongodb
     try:
-        agg_result = db.memes_comments.aggregate(
-            [
-                {
-                    "$group": {
-                        "_id": {"objectId": "$objectId", "comment": "$comment"},
-                        "n": {"$sum": 1},
-                    }
-                }
-            ]
-        )
-        db.memes_summary_comments.delete_many({})
+        agg_result = db.memes_comments.aggregate([
+              {
+         "$group": {
+                "_id": {
+                    "objectId": "$objectId",
+                    "comment": "$comment"
+                },
+                "n": {"$sum": 1}
+            }
+        }
+    ])
+
+        db.memes_sumaryComments.delete_many({})
         for i in agg_result:
             print(i)
-            summary_comments_id = db.memes_summary_comments.insert_one(i)
-            print("Summary comments inserted with record ids", summary_comments_id)
-
+            sumaryComments_id = db.memes_sumaryComments.insert_one(i)
+            print("Sumary Comments inserted with record ids: ", sumaryComments_id)
     except Exception as e:
-        print(f"group by caught {type(e)}: ")
+        print(f'group vy cought {type(e)}: ')
         print(e)
