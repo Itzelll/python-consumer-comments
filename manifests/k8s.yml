@@ -35,7 +35,7 @@ metadata:
 spec:
   type: ClusterIP  
   ports:
-  - name: "python-consumer"
+  - name: {model_name}
     port: 8081
   selector:
     app: {model_name}
