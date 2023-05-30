@@ -37,9 +37,9 @@ except:
     print("Could not connect to MongoDB")
 
 consumer = KafkaConsumer(
-    "comments",
+    'comments',
     bootstrap_servers=[
-        "comida-kafka-0.comida-kafka-headless.itzel2-itzelll.svc.cluster.local:9092"
+        'comida-kafka-0.comida-kafka-headless.itzel2-itzelll.svc.cluster.local:9092'
         #'localhost:9092'
     ],
 )
